@@ -85,7 +85,9 @@ export class HuiEnergyGasGraphCard
     return html`
       <ha-card>
         ${this._config.title
-          ? html`<h1 class="card-header">${this._config.title}</h1>`
+          ? html`<h1 class="card-header">
+              ${this._config.title} ${this._getTotal()}
+            </h1>`
           : ""}
         <div
           class="content ${classMap({
@@ -119,6 +121,28 @@ export class HuiEnergyGasGraphCard
       </ha-card>
     `;
   }
+
+  private _getTotal = () => {
+    if (!this._chartData.length) {
+      return "";
+    }
+    return (
+      formatNumber(
+        this._chartData.reduce(
+          (sum, dataset) =>
+            sum +
+            (dataset.data || []).reduce(
+              (acc: number, curr) =>
+                acc + (Array.isArray(curr) ? curr[1] : (curr as any).value[1]),
+              0
+            ),
+          0
+        )
+      ) +
+      " " +
+      this._unit
+    );
+  };
 
   private _formatTotal = (total: number) =>
     this.hass.localize(

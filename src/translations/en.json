@@ -9271,6 +9271,14 @@
         }
       },
       "energy": {
+        "electricity_overview_title": "Electricity",
+        "gas_overview_title": "Gas",
+        "water_overview_title": "Water",
+        "summary_list": {
+          "energy": "Energy",
+          "gas": "Gas",
+          "water": "Water"
+        },
         "download_data": "[%key:ui::panel::history::download_data%]",
         "configure": "[%key:ui::dialogs::quick-bar::commands::navigation::energy%]",
         "compare": {

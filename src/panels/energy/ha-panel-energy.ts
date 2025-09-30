@@ -34,8 +34,26 @@ const ENERGY_LOVELACE_CONFIG: LovelaceConfig = {
   views: [
     {
       strategy: {
+        type: "energy-overview",
+      },
+    },
+    {
+      strategy: {
         type: "energy",
       },
+      path: "electricity",
+    },
+    {
+      strategy: {
+        type: "water",
+      },
+      path: "water",
+    },
+    {
+      strategy: {
+        type: "gas",
+      },
+      path: "gas",
     },
   ],
 };
@@ -46,11 +64,14 @@ class PanelEnergy extends LitElement {
 
   @property({ type: Boolean, reflect: true }) public narrow = false;
 
-  @state() private _viewIndex = 0;
-
   @state() private _lovelace?: Lovelace;
 
   @state() private _searchParms = new URLSearchParams(window.location.search);
+
+  @property({ attribute: false }) public route?: {
+    path: string;
+    prefix: string;
+  };
 
   public willUpdate(changedProps: PropertyValues) {
     if (!this.hasUpdated) {
@@ -74,6 +95,10 @@ class PanelEnergy extends LitElement {
   }
 
   protected render(): TemplateResult {
+    let viewPath: string | undefined = this.route!.path.split("/")[1];
+    viewPath = viewPath ? decodeURI(viewPath) : undefined;
+    const viewIndex = Math.max(ENERGY_LOVELACE_CONFIG.views.findIndex((view) => view.path === viewPath), 0);
+
     return html`
       <div class="header">
         <div class="toolbar">
@@ -131,7 +156,7 @@ class PanelEnergy extends LitElement {
           .hass=${this.hass}
           .narrow=${this.narrow}
           .lovelace=${this._lovelace}
-          .index=${this._viewIndex}
+          .index=${viewIndex}
         ></hui-view>
       </hui-view-container>
     `;
@@ -463,7 +488,7 @@ class PanelEnergy extends LitElement {
     const config = this._lovelace!.config;
     this._lovelace = {
       ...this._lovelace!,
-      config: { ...config, views: [{ ...config.views[0] }] },
+      config: { ...config, views: config.views.map((view) => ({ ...view })) },
     };
   }
 
