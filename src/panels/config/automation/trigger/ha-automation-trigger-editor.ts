@@ -9,10 +9,12 @@ import "../../../../components/ha-yaml-editor";
 import type { HaYamlEditor } from "../../../../components/ha-yaml-editor";
 import type { Trigger } from "../../../../data/automation";
 import { migrateAutomationTrigger } from "../../../../data/automation";
+import type { TriggerDescription } from "../../../../data/trigger";
 import { isTriggerList } from "../../../../data/trigger";
 import { haStyle } from "../../../../resources/styles";
 import type { HomeAssistant } from "../../../../types";
 import "../ha-automation-editor-warning";
+import "./types/ha-automation-trigger-platform";
 
 @customElement("ha-automation-trigger-editor")
 export default class HaAutomationTriggerEditor extends LitElement {
@@ -28,6 +30,8 @@ export default class HaAutomationTriggerEditor extends LitElement {
     false;
 
   @property({ type: Boolean, attribute: "sidebar" }) public inSidebar = false;
+
+  @property({ attribute: false }) public description?: TriggerDescription;
 
   @query("ha-yaml-editor") public yamlEditor?: HaYamlEditor;
 
@@ -88,11 +92,18 @@ export default class HaAutomationTriggerEditor extends LitElement {
                   `
                 : nothing}
               <div @value-changed=${this._onUiChanged}>
-                ${dynamicElement(`ha-automation-trigger-${type}`, {
-                  hass: this.hass,
-                  trigger: this.trigger,
-                  disabled: this.disabled,
-                })}
+                ${this.description
+                  ? html`<ha-automation-trigger-platform
+                      .hass=${this.hass}
+                      .trigger=${this.trigger}
+                      .description=${this.description}
+                      .disabled=${this.disabled}
+                    ></ha-automation-trigger-platform>`
+                  : dynamicElement(`ha-automation-trigger-${type}`, {
+                      hass: this.hass,
+                      trigger: this.trigger,
+                      disabled: this.disabled,
+                    })}
               </div>
             `}
       </div>

@@ -44,7 +44,7 @@ import {
   domainToName,
   fetchIntegrationManifests,
 } from "../../../data/integration";
-import { TRIGGER_GROUPS, TRIGGER_ICONS } from "../../../data/trigger";
+import { TRIGGER_GROUPS } from "../../../data/trigger";
 import type { HassDialog } from "../../../dialogs/make-dialog-manager";
 import { KeyboardShortcutMixin } from "../../../mixins/keyboard-shortcut-mixin";
 import { HaFuse } from "../../../resources/fuse";
@@ -54,6 +54,7 @@ import { isMac } from "../../../util/is_mac";
 import { showToast } from "../../../util/toast";
 import type { AddAutomationElementDialogParams } from "./show-add-automation-element-dialog";
 import { PASTE_VALUE } from "./show-add-automation-element-dialog";
+import { TRIGGER_ICONS } from "../../../components/ha-trigger-icon";
 
 const TYPES = {
   trigger: { groups: TRIGGER_GROUPS, icons: TRIGGER_ICONS },
