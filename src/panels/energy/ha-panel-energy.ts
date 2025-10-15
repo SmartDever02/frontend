@@ -30,30 +30,22 @@ import {
 import { fileDownload } from "../../util/file_download";
 import type { StatisticValue } from "../../data/recorder";
 
+export const DEFAULT_ENERGY_COLLECTION_KEY = "energy_dashboard";
+
 const ENERGY_LOVELACE_CONFIG: LovelaceConfig = {
   views: [
     {
       strategy: {
         type: "energy-overview",
+        collection_key: DEFAULT_ENERGY_COLLECTION_KEY,
       },
     },
     {
       strategy: {
         type: "energy",
+        collection_key: DEFAULT_ENERGY_COLLECTION_KEY,
       },
       path: "electricity",
-    },
-    {
-      strategy: {
-        type: "water",
-      },
-      path: "water",
-    },
-    {
-      strategy: {
-        type: "gas",
-      },
-      path: "gas",
     },
   ],
 };
@@ -124,7 +116,7 @@ class PanelEnergy extends LitElement {
 
           <hui-energy-period-selector
             .hass=${this.hass}
-            collection-key="energy_dashboard"
+            .collectionKey=${DEFAULT_ENERGY_COLLECTION_KEY}
           >
             ${this.hass.user?.is_admin
               ? html` <ha-list-item
@@ -186,7 +178,7 @@ class PanelEnergy extends LitElement {
   private async _dumpCSV(ev) {
     ev.stopPropagation();
     const energyData = getEnergyDataCollection(this.hass, {
-      key: "energy_dashboard",
+      key: DEFAULT_ENERGY_COLLECTION_KEY,
     });
 
     if (!energyData.prefs || !energyData.state.stats) {
