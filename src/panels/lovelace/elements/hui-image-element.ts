@@ -10,8 +10,8 @@ import { actionHandler } from "../common/directives/action-handler-directive";
 import { handleAction } from "../common/handle-action";
 import { hasAction } from "../common/has-action";
 import "../components/hui-image";
-import type { ImageElementConfig, LovelaceElement } from "./types";
 import type { LovelacePictureElementEditor } from "../types";
+import type { ImageElementConfig, LovelaceElement } from "./types";
 
 @customElement("hui-image-element")
 export class HuiImageElement extends LitElement implements LovelaceElement {
@@ -50,6 +50,12 @@ export class HuiImageElement extends LitElement implements LovelaceElement {
       stateObj = this.hass.states[this._config.image_entity] as ImageEntity;
     }
 
+    const image = stateObj
+      ? computeImageUrl(stateObj)
+      : (typeof this._config?.image === "object" &&
+          this._config.image.media_content_id) ||
+        (this._config.image as string | undefined);
+
     return html`
       <div
         @action=${this._handleAction}
@@ -67,7 +73,7 @@ export class HuiImageElement extends LitElement implements LovelaceElement {
         <hui-image
           .hass=${this.hass}
           .entity=${this._config.entity}
-          .image=${stateObj ? computeImageUrl(stateObj) : this._config.image}
+          .image=${image}
           .stateImage=${this._config.state_image}
           .cameraImage=${this._config.camera_image}
           .cameraView=${this._config.camera_view}
@@ -97,7 +103,7 @@ export class HuiImageElement extends LitElement implements LovelaceElement {
     }
     div:focus hui-image {
       background: var(--divider-color);
-      border-radius: 100%;
+      border-radius: var(--ha-border-radius-pill);
     }
   `;
 

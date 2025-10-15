@@ -2,7 +2,10 @@ import { ReactiveElement } from "lit";
 import { customElement } from "lit/decorators";
 import { computeDeviceName } from "../../../../common/entity/compute_device_name";
 import { getEntityContext } from "../../../../common/entity/context/get_entity_context";
-import { generateEntityFilter } from "../../../../common/entity/entity_filter";
+import {
+  findEntities,
+  generateEntityFilter,
+} from "../../../../common/entity/entity_filter";
 import { clamp } from "../../../../common/number/clamp";
 import type { LovelaceBadgeConfig } from "../../../../data/lovelace/config/badge";
 import type { LovelaceCardConfig } from "../../../../data/lovelace/config/card";
@@ -12,7 +15,6 @@ import type { HomeAssistant } from "../../../../types";
 import type { HeadingCardConfig } from "../../cards/types";
 import { computeAreaTileCardConfig } from "../areas/helpers/areas-strategy-helper";
 import {
-  findEntities,
   getSummaryLabel,
   HOME_SUMMARIES,
   HOME_SUMMARIES_FILTERS,
@@ -100,22 +102,22 @@ export class HomeAreaViewStrategy extends ReactiveElement {
     );
 
     const {
-      lights,
+      light,
       climate,
-      security,
+      safety,
       media_players: mediaPlayers,
     } = entitiesBySummary;
 
-    if (lights.length > 0) {
+    if (light.length > 0) {
       sections.push({
         type: "grid",
         cards: [
           computeHeadingCard(
-            getSummaryLabel(hass.localize, "lights"),
-            HOME_SUMMARIES_ICONS.lights,
-            "lights"
+            getSummaryLabel(hass.localize, "light"),
+            HOME_SUMMARIES_ICONS.light,
+            "/light?historyBack=1"
           ),
-          ...lights.map(computeTileCard),
+          ...light.map(computeTileCard),
         ],
       });
     }
@@ -127,23 +129,23 @@ export class HomeAreaViewStrategy extends ReactiveElement {
           computeHeadingCard(
             getSummaryLabel(hass.localize, "climate"),
             HOME_SUMMARIES_ICONS.climate,
-            "climate"
+            "/climate?historyBack=1"
           ),
           ...climate.map(computeTileCard),
         ],
       });
     }
 
-    if (security.length > 0) {
+    if (safety.length > 0) {
       sections.push({
         type: "grid",
         cards: [
           computeHeadingCard(
-            getSummaryLabel(hass.localize, "security"),
-            HOME_SUMMARIES_ICONS.security,
-            "security"
+            getSummaryLabel(hass.localize, "safety"),
+            HOME_SUMMARIES_ICONS.safety,
+            "/safety?historyBack=1"
           ),
-          ...security.map(computeTileCard),
+          ...safety.map(computeTileCard),
         ],
       });
     }
@@ -155,7 +157,7 @@ export class HomeAreaViewStrategy extends ReactiveElement {
           computeHeadingCard(
             getSummaryLabel(hass.localize, "media_players"),
             HOME_SUMMARIES_ICONS.media_players,
-            "media-players"
+            "/media-players"
           ),
           ...mediaPlayers.map(computeTileCard),
         ],
@@ -268,15 +270,12 @@ export class HomeAreaViewStrategy extends ReactiveElement {
               })),
             ],
           } satisfies HeadingCardConfig,
-          ...entities.map((e) => {
-            const stateObj = hass.states[e];
-            return {
-              ...computeTileCard(e),
-              name:
-                hass.formatEntityName(stateObj, "entity") ||
-                hass.formatEntityName(stateObj, "device"),
-            };
-          }),
+          ...entities.map((e) => ({
+            ...computeTileCard(e),
+            name: {
+              type: "entity",
+            },
+          })),
         ],
       });
     }
