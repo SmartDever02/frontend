@@ -29,7 +29,6 @@ import type {
 import type { LovelaceHeaderFooterConfig } from "../header-footer/types";
 import type { LovelaceHeadingBadgeConfig } from "../heading-badges/types";
 import type { HomeSummary } from "../strategies/home/helpers/home-summaries";
-import type { EnergySummary } from "../strategies/energy/helpers/energy-summaries";
 import type { MediaSelectorValue } from "../../../data/selector";
 
 export type AlarmPanelCardConfigState =
@@ -149,11 +148,6 @@ export interface ButtonCardConfig extends LovelaceCardConfig {
 
 export interface EnergyCardBaseConfig extends LovelaceCardConfig {
   collection_key?: string;
-}
-
-export interface EnergySummaryCardConfig extends EnergyCardBaseConfig {
-  type: "energy-summary";
-  title?: string;
 }
 
 export interface EnergyDistributionCardConfig extends EnergyCardBaseConfig {
@@ -609,14 +603,6 @@ export interface HeadingCardConfig extends LovelaceCardConfig {
 
 export interface HomeSummaryCard extends LovelaceCardConfig {
   summary: HomeSummary;
-  vertical?: boolean;
-  tap_action?: ActionConfig;
-  hold_action?: ActionConfig;
-  double_tap_action?: ActionConfig;
-}
-
-export interface EnergySummaryCard extends LovelaceCardConfig {
-  summary: EnergySummary;
   vertical?: boolean;
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;

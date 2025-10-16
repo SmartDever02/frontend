@@ -25,7 +25,7 @@ export class EnergyViewStrategy extends ReactiveElement {
     });
     const prefs = energyCollection.prefs;
 
-    // No energy sources available, start from scratch
+    // No energy sources available
     if (
       !prefs ||
       (prefs.device_consumption.length === 0 &&

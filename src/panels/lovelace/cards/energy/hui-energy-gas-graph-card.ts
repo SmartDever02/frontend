@@ -131,28 +131,6 @@ export class HuiEnergyGasGraphCard
     `;
   }
 
-  private _getTotal = () => {
-    if (!this._chartData.length) {
-      return "";
-    }
-    return (
-      formatNumber(
-        this._chartData.reduce(
-          (sum, dataset) =>
-            sum +
-            (dataset.data || []).reduce(
-              (acc: number, curr) =>
-                acc + (Array.isArray(curr) ? curr[1] : (curr as any).value[1]),
-              0
-            ),
-          0
-        )
-      ) +
-      " " +
-      this._unit
-    );
-  };
-
   private _formatTotal = (total: number) =>
     this.hass.localize(
       "ui.panel.lovelace.cards.energy.energy_gas_graph.total_consumed",
