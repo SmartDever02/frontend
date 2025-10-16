@@ -1,30 +1,13 @@
 import { ReactiveElement } from "lit";
 import { customElement } from "lit/decorators";
-import type {
-  EnergyPreferences,
-  GridSourceTypeEnergyPreference,
-} from "../../../data/energy";
-import { getEnergyPreferences } from "../../../data/energy";
+import type { GridSourceTypeEnergyPreference } from "../../../data/energy";
+import { getEnergyDataCollection } from "../../../data/energy";
 import type { HomeAssistant } from "../../../types";
 import type { LovelaceViewConfig } from "../../../data/lovelace/config/view";
 import type { LovelaceStrategyConfig } from "../../../data/lovelace/config/strategy";
 import type { LovelaceSectionConfig } from "../../../data/lovelace/config/section";
 import type { LovelaceCardConfig } from "../../../data/lovelace/config/card";
 import { DEFAULT_ENERGY_COLLECTION_KEY } from "../ha-panel-energy";
-
-const setupWizard = async (): Promise<LovelaceViewConfig> => {
-  await import("../cards/energy-setup-wizard-card");
-  return {
-    type: "panel",
-    cards: [
-      {
-        type: "custom:energy-setup-wizard-card",
-      },
-    ],
-  };
-};
-
-const COLUMNS = 2;
 
 @customElement("energy-overview-view-strategy")
 export class EnergyViewStrategy extends ReactiveElement {
@@ -34,34 +17,21 @@ export class EnergyViewStrategy extends ReactiveElement {
   ): Promise<LovelaceViewConfig> {
     const view: LovelaceViewConfig = { type: "sections", sections: [] };
 
-    let prefs: EnergyPreferences;
     const collectionKey =
       _config.collection_key || DEFAULT_ENERGY_COLLECTION_KEY;
 
-    try {
-      prefs = await getEnergyPreferences(hass);
-    } catch (err: any) {
-      if (err.code === "not_found") {
-        return setupWizard();
-      }
-      view.sections!.push({
-        column_span: COLUMNS,
-        cards: [
-          {
-            type: "markdown",
-            content: `An error occurred while fetching your energy preferences: ${err.message}.`,
-          },
-        ],
-      });
-      return view;
-    }
+    const energyCollection = getEnergyDataCollection(hass, {
+      key: collectionKey,
+    });
+    const prefs = energyCollection.prefs;
 
     // No energy sources available, start from scratch
     if (
-      prefs!.device_consumption.length === 0 &&
-      prefs!.energy_sources.length === 0
+      !prefs ||
+      (prefs.device_consumption.length === 0 &&
+        prefs.energy_sources.length === 0)
     ) {
-      return setupWizard();
+      return view;
     }
 
     const hasGrid = prefs.energy_sources.find(
@@ -156,6 +126,24 @@ export class EnergyViewStrategy extends ReactiveElement {
 
     view.sections!.push(energySection);
 
+    if (hasGrid || hasSolar || hasBattery || hasGas || hasWater) {
+      view.sections!.push({
+        type: "grid",
+        cards: [
+          {
+            type: "heading",
+            heading: hass.localize(
+              "ui.panel.energy.cards.energy_sources_table_title"
+            ),
+          },
+          {
+            type: "energy-sources-table",
+            collection_key: collectionKey,
+          },
+        ],
+      });
+    }
+
     if (hasGas) {
       view.sections!.push({
         type: "grid",
@@ -188,24 +176,6 @@ export class EnergyViewStrategy extends ReactiveElement {
               "ui.panel.energy.cards.energy_water_graph_title"
             ),
             type: "energy-water-graph",
-            collection_key: collectionKey,
-          },
-        ],
-      });
-    }
-
-    if (hasGrid || hasSolar || hasBattery || hasGas || hasWater) {
-      view.sections!.push({
-        type: "grid",
-        cards: [
-          {
-            type: "heading",
-            heading: hass.localize(
-              "ui.panel.energy.cards.energy_sources_table_title"
-            ),
-          },
-          {
-            type: "energy-sources-table",
             collection_key: collectionKey,
           },
         ],

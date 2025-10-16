@@ -379,7 +379,7 @@ export class HuiEnergyDevicesGraphCard
           show: true,
           position: "center",
           color: computedStyle.getPropertyValue("--secondary-text-color"),
-          fontSize: computedStyle.getPropertyValue("--ha-font-size-l"),
+          fontSize: computedStyle.getPropertyValue("--ha-font-size-m"),
           lineHeight: 24,
           fontWeight: "bold",
           formatter: `{a}\n${formatNumber(totalUsed, this.hass.locale)} kWh`,
